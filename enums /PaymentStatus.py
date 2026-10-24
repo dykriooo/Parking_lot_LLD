@@ -9,6 +9,6 @@ public enum PaymentStatus {
 """
 from enums import Enum 
 class PaymentStatus(Enum):
-    PENDING ="pending"
-    SUCCESS = "success"
+    PENDING ="PENDING"
+    SUCCESS = "SUCCESS"
     FAILED ="failed"
