@@ -5,7 +5,7 @@ public enum VehicleType {
     CAR, BIKE, TRUCK
 }
 """
-from enums import  Enum 
+from enum import Enum
 class VehicleType(Enum):
     CAR ="CAR"
     BIKE ="BIKE"

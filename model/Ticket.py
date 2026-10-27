@@ -19,6 +19,10 @@ public class Ticket {
 }
 """
 
+from datetime import datetime
+from ..enums.PaymentStatus import PaymentStatus
+
+
 class Ticket:
     def __init__(self, ticketId: str, entryTime: datetime, vehicle: Vehicle, floorId: str, spotId: str, paymentStatus: PaymentStatus):
         self.ticketId = ticketId

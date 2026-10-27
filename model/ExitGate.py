@@ -25,11 +25,9 @@ public class ExitGate extends Gate {
 
 
 from datetime import datetime
-from typing import Optional
 from .Gate import Gate
 from ..enums.GateType import GateType
-from .Vehicle import Vehicle
-from .Ticket import Ticket
+from ..enums.PaymentMode import PaymentMode
 
 
 class ExitGate(Gate):
@@ -39,6 +37,6 @@ class ExitGate(Gate):
     def getType(self) -> GateType:
         return GateType.EXIT
 
-    def parkVehicle(self, vehicle: Vehicle, exitTime: datetime) -> Optional[Ticket]:
+    def unparkVehicle(self, ticketId: str, exitTime: datetime, paymentMode: PaymentMode):
         from ..service.ParkingLot import ParkingLot
-        return ParkingLot.getInstance().parkVehicle(vehicle, exitTime)
+        ParkingLot.getInstance().unparkVehicle(ticketId, exitTime, paymentMode)

@@ -36,6 +36,8 @@ public class ParkingSpot {
     }
 }"""
 
+from ..enums.VehicleType import VehicleType
+
 class ParkingSpot:
     def __init__(self, id: str, allowedType: VehicleType):
         self.id = id

@@ -52,20 +52,21 @@ public class TimeBasedPricing implements PricingStrategy {
         return peakHours * peakRate + nonPeakHours * nonPeakRate;
     }
 }"""
-import math 
-from ..enums.VehicleType import VehicleType
+import math
+from datetime import datetime, time, timedelta
+from ...enums.VehicleType import VehicleType
 from .PricingStrategy import PricingStrategy
 
-class TimeBasedPricing(PricingStrategy):
-    def __init__(self):
-        self.PEAK_START = LocalTime.of(8, 0)
-        self.PEAK_END = LocalTime.of(17, 0)
 
-    def isPeak(self, time: LocalTime) -> bool:
-        return not time.isBefore(self.PEAK_START) and not time.isAfter(self.PEAK_END)
+class TimeBasedPricing(PricingStrategy):
+    PEAK_START = time(8, 0)
+    PEAK_END = time(17, 0)
+
+    def isPeak(self, t: time) -> bool:
+        return self.PEAK_START <= t <= self.PEAK_END
 
     def calculateFee(self, type: VehicleType, entryTime: datetime, exitTime: datetime) -> float:
-        if exitTime.isBefore(entryTime):
+        if exitTime < entryTime:
             raise ValueError("Exit time before entry time")
 
         durationMinutes = (exitTime - entryTime).total_seconds() / 60
@@ -77,7 +78,7 @@ class TimeBasedPricing(PricingStrategy):
 
         cursor = entryTime.replace(minute=0, second=0, microsecond=0)
         # If entry time has minutes, consider first hour partially occupied, count as 1 hour anyway (already rounded)
-        for i in range(totalHours):
+        for i in range(int(totalHours)):
             hourStart = cursor.time()
             if self.isPeak(hourStart):
                 peakHours += 1

@@ -29,7 +29,7 @@ public class ParkingFloor {
 }"""
 from .ParkingSpot import ParkingSpot
 from ..enums.VehicleType import VehicleType
-from typing import Dict
+from typing import Dict, Optional
 
 class ParkingFloor:
     def __init__(self, id: str):

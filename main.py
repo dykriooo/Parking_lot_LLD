@@ -60,56 +60,59 @@ public class Main {
 /*
 
  */"""
-from .enums import *
-from .factory import *
-from .model import *
-from .service import *
-from .utils import *
 
 import threading
+import sys
+import os
 
-class Main:
-    def main(self):
-        lot = ParkingLot.getInstance()
-        entryGate = EntryGate("EG1")
-        exitGate = ExitGate("XG1")
+# Add the parent directory to sys.path so we can use absolute package imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-        lot.setPricingStrategy(PricingStrategyFactory.get(PricingStrategyType.valueOf("EVENT_BASED")))
+from Parking_lot_LLD.enums.VehicleType import VehicleType
+from Parking_lot_LLD.enums.PricingStratergyType import PricingStrategyType
+from Parking_lot_LLD.factory.VehicleFactory import VehicleFactory
+from Parking_lot_LLD.factory.PricingStrategyFactory import PricingStrategyFactory
+from Parking_lot_LLD.model.EntryGate import EntryGate
+from Parking_lot_LLD.model.ExitGate import ExitGate
+from Parking_lot_LLD.model.ParkingFloor import ParkingFloor
+from Parking_lot_LLD.model.ParkingSpot import ParkingSpot
+from Parking_lot_LLD.service.ParkingLot import ParkingLot
+from Parking_lot_LLD.utils.DateTimeParse import DateTimeParser
 
-        floor1 = ParkingFloor("Floor1")
-        floor1.addSpot(ParkingSpot("F1S1", VehicleType.BIKE))
-        floor1.addSpot(ParkingSpot("F1S2", VehicleType.CAR))
-        floor1.addSpot(ParkingSpot("F1S3", VehicleType.TRUCK))
-        floor1.addSpot(ParkingSpot("F1S4", VehicleType.CAR))
-        lot.addFloor(floor1)
 
-        print("--------------------------")
+def main():
+    lot = ParkingLot.getInstance()
+    entryGate = EntryGate("EG1")
+    exitGate = ExitGate("XG1")
 
-        bike1 = VehicleFactory.create("KA01AB1234", VehicleType.BIKE)
-        bike2 = VehicleFactory.create("KA01AB5678", VehicleType.BIKE)
-        entryTime = DateTimeParser.parse("21 May 7:30 AM 2025")
-        print(entryTime)
+    lot.setPricingStrategy(PricingStrategyFactory.get(PricingStrategyType.EVENT_BASED))
 
-        t1 = threading.Thread(target=entryGate.parkVehicle, args=(bike1, entryTime))
-        t2 = threading.Thread(target=entryGate.parkVehicle, args=(bike2, entryTime))
+    floor1 = ParkingFloor("Floor1")
+    floor1.addSpot(ParkingSpot("F1S1", VehicleType.BIKE))
+    floor1.addSpot(ParkingSpot("F1S2", VehicleType.CAR))
+    floor1.addSpot(ParkingSpot("F1S3", VehicleType.TRUCK))
+    floor1.addSpot(ParkingSpot("F1S4", VehicleType.CAR))
+    lot.addFloor(floor1)
 
-        t1.start()
-        t2.start()
+    print("--------------------------")
 
-        # Vehicle car = VehicleFactory.create("KA01AB1234", VehicleType.SEDAN)
-        #
-        # entryTime = DateTimeParser.parse("21 May 7:30 AM 2025")
-        # ticket = entryGate.parkVehicle(car, entryTime)
-        #
-        # print("--------------------------")
-        #
-        # lot.printStatus()
-        #
-        # print("--------------------------")
-        #
-        # exitTime = DateTimeParser.parse("21 May 1:15 PM 2025")
-        # exitGate.unparkVehicle(ticket.getTicketId(), exitTime, PaymentMode.UPI)
-        #
-        # print("--------------------------")
-        #
-        # lot.printStatus()
+    bike1 = VehicleFactory.create("KA01AB1234", VehicleType.BIKE)
+    bike2 = VehicleFactory.create("KA01AB5678", VehicleType.BIKE)
+    entryTime = DateTimeParser.parse("21 May 7:30 AM 2025")
+    print(entryTime)
+
+    t1 = threading.Thread(target=entryGate.parkVehicle, args=(bike1, entryTime))
+    t2 = threading.Thread(target=entryGate.parkVehicle, args=(bike2, entryTime))
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
+    print("--------------------------")
+    lot.printStatus()
+
+
+if __name__ == "__main__":
+    main()

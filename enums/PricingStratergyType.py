@@ -5,7 +5,7 @@ public enum PricingStrategyType {
     TIME_BASED, EVENT_BASED
 }
 """
-from enums import Enum
+from enum import Enum
 
 class PricingStrategyType(Enum):
     TIME_BASED = "TIME_BASED"

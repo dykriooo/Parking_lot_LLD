@@ -7,7 +7,7 @@ public enum GateType {
 }
 """
 
-from enums import Enum
+from enum import Enum
 
 class GateType(Enum):
     ENTRY="ENTRY"

@@ -9,8 +9,8 @@ public interface PricingStrategy {
 }"""
 
 from abc import ABC, abstractmethod
-from ..enums.VehicleType import VehicleType
-from ..utils.DateTimeParse import DateTimeParse
+from datetime import datetime
+from ...enums.VehicleType import VehicleType
 
 
 class PricingStrategy(ABC):

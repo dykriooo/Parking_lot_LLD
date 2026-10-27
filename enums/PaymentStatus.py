@@ -7,7 +7,7 @@ public enum PaymentStatus {
     FAILED
 }
 """
-from enums import Enum 
+from enum import Enum
 class PaymentStatus(Enum):
     PENDING ="PENDING"
     SUCCESS = "SUCCESS"

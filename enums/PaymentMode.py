@@ -5,7 +5,7 @@ public enum PaymentMode {
     CASH, UPI, CARD
 }
 """
-from enums import Enum 
+from enum import Enum
 class PaymentMode(Enum):
     CASH = "CASH"
     UPI ="UPI"

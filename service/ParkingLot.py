@@ -1,5 +1,8 @@
 """
 package org.nailyourinterview.lld.parking_lot.service;
+... (Java code preserved in docstring)
+
+package org.nailyourinterview.lld.parking_lot.service;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -105,107 +108,8 @@ public class ParkingLot {
 """
 package org.nailyourinterview.lld.parking_lot.service;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.nailyourinterview.lld.parking_lot.enums.PaymentMode;
-import org.nailyourinterview.lld.parking_lot.enums.*;
-import org.nailyourinterview.lld.parking_lot.factory.*;
-import org.nailyourinterview.lld.parking_lot.model.*;
-import org.nailyourinterview.lld.parking_lot.strategy.payment.*;
-import org.nailyourinterview.lld.parking_lot.strategy.pricing.*;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
-@Getter
-public class ParkingLot {
-    private static final ParkingLot INSTANCE = new ParkingLot();
-
-    private final Map<String, ParkingFloor> floors = new HashMap<>();
-    private final Map<String, Ticket> activeTickets = new HashMap<>();
-    @Setter
-    private PricingStrategy pricingStrategy;
-
-    private ParkingLot() {
-        this.pricingStrategy = PricingStrategyFactory.get(PricingStrategyType.TIME_BASED);
-    }
-
-    public static ParkingLot getInstance() {
-        return INSTANCE;
-    }
-
-    public void addFloor(ParkingFloor floor) {
-        floors.put(floor.getId(), floor);
-    }
-
-    // b1, b2 (one spot)
-    // car, bike
-
-    public Ticket parkVehicle(Vehicle vehicle, LocalDateTime entryTime) {
-        for (ParkingFloor floor : floors.values()) {
-            ParkingSpot spot = floor.findAvailableSpot(vehicle.getType());
-
-            if (spot != null) {
-                // Successfully reserved the spot via atomic operation
-                String ticketId = UUID.randomUUID().toString();
-                Ticket ticket = Ticket.builder()
-                        .ticketId(ticketId)
-                        .entryTime(entryTime)
-                        .vehicle(vehicle)
-                        .floorId(floor.getId())
-                        .spotId(spot.getId())
-                        .build();
-
-                activeTickets.put(ticketId, ticket);
-                System.out.println("Vehicle parked. Ticket: " + ticketId);
-                return ticket;
-            }
-        }
-
-        System.out.println("No spot available for vehicle type: " + vehicle.getType());
-        return null;
-    }
-
-    public void unparkVehicle(String ticketId, LocalDateTime exitTime, PaymentMode paymentMode) {
-        Ticket ticket = activeTickets.get(ticketId);
-        if (ticket == null) {
-            System.out.println("Invalid ticket ID.");
-            return;
-        }
-
-        double fee = pricingStrategy.calculateFee(
-                ticket.getVehicle().getType(),
-                ticket.getEntryTime(),
-                exitTime
-        );
-
-        PaymentStrategy strategy = PaymentStrategyFactory.get(paymentMode);
-        PaymentProcessor processor = new PaymentProcessor(strategy);
-        boolean paid = processor.pay(ticket, fee);
-
-        if (!paid) {
-            System.out.println("Vehicle cannot exit. Payment unsuccessful.");
-            return;
-        }
-
-        ParkingSpot spot = floors.get(ticket.getFloorId()).getSpots().get(ticket.getSpotId());
-        spot.vacate();
-        activeTickets.remove(ticketId);
-
-        System.out.println("Vehicle exited. Fee charged: ₹" + fee);
-    }
-
-    public void printStatus() {
-        floors.forEach((floorId, floor) -> {
-            System.out.println("Floor: " + floorId);
-            floor.getSpots().values().forEach(spot -> {
-                System.out.println(" Spot " + spot.getId() + " [" + spot.getAllowedType() + "] - " + (spot.isOccupied() ? "Occupied" : "Free"));
-            });
-        });
-    }
-}
 """
 
 import uuid
@@ -213,14 +117,13 @@ from datetime import datetime
 from typing import Dict, Optional
 
 from ..enums.PaymentMode import PaymentMode
-from ..enums.PricingStrategyType import PricingStrategyType
+from ..enums.PricingStratergyType import PricingStrategyType
 from ..factory.PaymentStrategyFactory import PaymentStrategyFactory
-from ..factory.PricingStrategyFactory import PricingStrategyFactory
+from ..factory.PricingStrategyFactory import PricingStrategyFactory as PricingFactory
 from ..model.ParkingFloor import ParkingFloor
 from ..model.ParkingSpot import ParkingSpot
 from ..model.Ticket import Ticket
-from ..model.Vehicle import Vehicle
-from ..strategy.payment.PaymentStrategy import PaymentStrategy
+from ..enums.PaymentStatus import PaymentStatus
 from ..strategy.pricing.PricingStrategy import PricingStrategy
 from .PaymentProcessor import PaymentProcessor
 
@@ -231,7 +134,7 @@ class ParkingLot:
     def __init__(self):
         self.floors: Dict[str, ParkingFloor] = {}
         self.activeTickets: Dict[str, Ticket] = {}
-        self.pricingStrategy: PricingStrategy = PricingStrategyFactory.get(PricingStrategyType.TIME_BASED)
+        self.pricingStrategy: PricingStrategy = PricingFactory.get(PricingStrategyType.TIME_BASED)
 
     @classmethod
     def getInstance(cls) -> "ParkingLot":
@@ -248,20 +151,21 @@ class ParkingLot:
     # b1, b2 (one spot)
     # car, bike
 
-    def parkVehicle(self, vehicle: Vehicle, entryTime: datetime) -> Optional[Ticket]:
+    def parkVehicle(self, vehicle, entryTime: datetime) -> Optional[Ticket]:
         for floor in self.floors.values():
             spot = floor.findAvailableSpot(vehicle.getType())
 
             if spot is not None:
                 # Successfully reserved the spot via atomic operation
                 ticketId = str(uuid.uuid4())
-                ticket = Ticket.builder() \
-                    .ticketId(ticketId) \
-                    .entryTime(entryTime) \
-                    .vehicle(vehicle) \
-                    .floorId(floor.getId()) \
-                    .spotId(spot.getId()) \
-                    .build()
+                ticket = Ticket(
+                    ticketId=ticketId,
+                    entryTime=entryTime,
+                    vehicle=vehicle,
+                    floorId=floor.getId(),
+                    spotId=spot.getId(),
+                    paymentStatus=PaymentStatus.PENDING
+                )
 
                 self.activeTickets[ticketId] = ticket
                 print(f"Vehicle parked. Ticket: {ticketId}")
@@ -302,5 +206,3 @@ class ParkingLot:
             for spot in floor.getSpots().values():
                 status_str = "Occupied" if spot.isOccupied() else "Free"
                 print(f" Spot {spot.getId()} [{spot.getAllowedType()}] - {status_str}")
-
-    

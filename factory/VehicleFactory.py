@@ -20,8 +20,9 @@ from ..model.Bike import Bike
 from ..model.Truck import Truck
 from ..model.Vehicle import Vehicle
 class VehicleFactory:
-    def create(self, number: str, type: VehicleType) -> Vehicle:
-        match type :
+    @staticmethod
+    def create(number: str, type: VehicleType) -> Vehicle:
+        match type:
             case VehicleType.CAR:
                 return Car(number)
             case VehicleType.BIKE:
