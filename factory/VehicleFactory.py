@@ -14,3 +14,17 @@ public class VehicleFactory {
     }
 }
 """
+from ..enums.VehicleType import VehicleType
+from ..model.Car import Car
+from ..model.Bike import Bike
+from ..model.Truck import Truck
+from ..model.Vehicle import Vehicle
+class VehicleFactory:
+    def create(self, number: str, type: VehicleType) -> Vehicle:
+        match type :
+            case VehicleType.CAR:
+                return Car(number)
+            case VehicleType.BIKE:
+                return Bike(number)
+            case VehicleType.TRUCK:
+                return Truck(number)

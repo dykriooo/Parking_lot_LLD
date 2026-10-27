@@ -22,3 +22,23 @@ public class ExitGate extends Gate {
         ParkingLot.getInstance().unparkVehicle(ticketId, exitTime, paymentMode);
     }
 }"""
+
+
+from datetime import datetime
+from typing import Optional
+from .Gate import Gate
+from ..enums.GateType import GateType
+from .Vehicle import Vehicle
+from .Ticket import Ticket
+
+
+class ExitGate(Gate):
+    def __init__(self, id: str):
+        super().__init__(id)
+
+    def getType(self) -> GateType:
+        return GateType.EXIT
+
+    def parkVehicle(self, vehicle: Vehicle, exitTime: datetime) -> Optional[Ticket]:
+        from ..service.ParkingLot import ParkingLot
+        return ParkingLot.getInstance().parkVehicle(vehicle, exitTime)

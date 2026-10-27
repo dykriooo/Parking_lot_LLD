@@ -13,3 +13,15 @@ public class PricingStrategyFactory {
     }
 }
 """
+from ..enums.PricingStrategyType import PricingStrategyType
+from ..strategy.pricing.TimeBasedPricing import TimeBasedPricing
+from ..strategy.pricing.EventBasedPricing import EventBasedPricing
+from ..strategy.pricing.PricingStrategy import PricingStrategy
+
+class PricingFactory : 
+    def get(self, type: PricingStrategyType) -> PricingStrategy:
+        match type :
+            case PricingStrategyType.TIME_BASED:
+                return TimeBasedPricing()
+            case PricingStrategyType.EVENT_BASED:
+                return EventBasedPricing()

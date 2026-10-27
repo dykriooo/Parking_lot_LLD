@@ -35,3 +35,27 @@ public class ParkingSpot {
         return occupied.get();
     }
 }"""
+
+class ParkingSpot:
+    def __init__(self, id: str, allowedType: VehicleType):
+        self.id = id
+        self.allowedType = allowedType
+        self.occupied = False
+    
+    def getId(self) -> str:
+        return self.id
+    
+    def getAllowedType(self) -> VehicleType:
+        return self.allowedType
+    
+    def isOccupied(self) -> bool:
+        return self.occupied
+    
+    def tryOccupy(self) -> bool:
+        if self.occupied:
+            return False
+        self.occupied = True
+        return True
+    
+    def vacate(self):
+        self.occupied = False
